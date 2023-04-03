@@ -1,11 +1,13 @@
 import logo from "./logo.svg";
 import "./App.css";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Table, Form, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
   const [movies, setMovies] = useState([]);
+  const searchTerm = useRef();
+  const movieToAdd = useRef();
 
   useEffect(() => {
     fetch("http://localhost:8080/movies")
@@ -16,12 +18,14 @@ function App() {
       .catch((err) => console.error);
   }, []);
 
-  const handleSearch = (event) => {
-    event.preventDefault();
-    console.log(event.target[0].value);
+  const handleSearch = (e) => {
+    e.preventDefault();
+    console.log(searchTerm.current.value);
     setMovies(
       movies.filter((movie) =>
-        movie.title.toLowerCase().includes(event.target[0].value.toLowerCase())
+        movie.title
+          .toLowerCase()
+          .includes(searchTerm.current.value.toLowerCase())
       )
     );
   };
@@ -33,7 +37,7 @@ function App() {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ title: event.target[0].value }),
+      body: JSON.stringify({ title: movieToAdd.current.value }),
     });
   };
 
@@ -66,13 +70,23 @@ function App() {
       <div>
         <Form onSubmit={handleSearch}>
           <Form.Group className="mb-3 w-25">
-            <Form.Control type="text" placeholder="Search"></Form.Control>
+            <Form.Control
+              ref={searchTerm}
+              type="text"
+              placeholder="Search"
+            ></Form.Control>
           </Form.Group>
         </Form>
         <Form onSubmit={addMovie}>
-          <Form.Group className="mb-3 w-50">
-            <Form.Control type="text" placeholder="Movie Name"></Form.Control>
-            <Button type="submit">Add</Button>
+          <Form.Group className="w-50">
+            <Form.Control
+              ref={movieToAdd}
+              type="text"
+              placeholder="Movie Name"
+            ></Form.Control>
+            <Button className="mt-2" type="submit">
+              Add
+            </Button>
           </Form.Group>
         </Form>
       </div>
