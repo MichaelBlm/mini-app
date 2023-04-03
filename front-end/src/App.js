@@ -25,6 +25,18 @@ function App() {
       )
     );
   };
+
+  const addMovie = (event) => {
+    fetch("http://localhost:8080/movies", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ title: event.target[0].value }),
+    });
+  };
+
   return (
     <div className="m-2">
       <Table
@@ -57,9 +69,10 @@ function App() {
             <Form.Control type="text" placeholder="Search"></Form.Control>
           </Form.Group>
         </Form>
-        <Form>
+        <Form onSubmit={addMovie}>
           <Form.Group className="mb-3 w-50">
             <Form.Control type="text" placeholder="Movie Name"></Form.Control>
+            <Button type="submit">Add</Button>
           </Form.Group>
         </Form>
       </div>
