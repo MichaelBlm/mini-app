@@ -46,6 +46,7 @@ function App() {
     inputRef.current.value = "";
   }
 
+  const handleWatched = (e) => {};
   return (
     <>
       Search:
@@ -54,6 +55,8 @@ function App() {
         onChange={(e) => setQuery(e.target.value)}
         type="search"
       />
+      <button>Watched</button>
+      <button>To Watch</button>
       <br />
       <br />
       <form onSubmit={onSubmit}>
@@ -61,9 +64,14 @@ function App() {
         <button type="submit">Add</button>
       </form>
       <h3>Movies:</h3>
-      {filtedMovies?.map(({ title, id }) => (
-        <div key={id}>{title}</div>
-      ))}
+      {filtedMovies?.map(({ title, id }) => {
+        return (
+          <div>
+            <button>⭐</button>
+            <span key={id}>{title}</span>
+          </div>
+        );
+      })}
     </>
   );
 }
