@@ -1,6 +1,6 @@
 import logo from "./logo.svg";
 import "./App.css";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 
 function App() {
   const [movies, setMovies] = useState([]);
@@ -16,9 +16,11 @@ function App() {
       .catch((err) => console.error);
   };
 
-  const filtedMovies = movies?.filter(({ title }) => {
-    return title?.toLowerCase().includes(query?.toLowerCase());
-  });
+  const filtedMovies = useMemo(() => {
+    return movies?.filter(({ title }) => {
+      return title?.toLowerCase().includes(query?.toLowerCase());
+    });
+  }, [movies, query]);
 
   useEffect(() => {
     fetchMovies();
