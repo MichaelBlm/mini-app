@@ -1,96 +1,68 @@
 import logo from "./logo.svg";
 import "./App.css";
 import React, { useState, useEffect, useRef } from "react";
-import { Table, Form, Button } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
   const [movies, setMovies] = useState([]);
-  const searchTerm = useRef();
-  const movieToAdd = useRef();
+  const [query, setQuery] = useState("");
+  const inputRef = useRef();
 
-  useEffect(() => {
-    fetch("http://localhost:8080/movies")
+  const fetchMovies = () => {
+    return fetch("http://localhost:8080/movies")
       .then((res) => res.json())
       .then((data) => {
         setMovies(data);
       })
       .catch((err) => console.error);
-  }, []);
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    console.log(searchTerm.current.value);
-    setMovies(
-      movies.filter((movie) =>
-        movie.title
-          .toLowerCase()
-          .includes(searchTerm.current.value.toLowerCase())
-      )
-    );
   };
 
-  const addMovie = (event) => {
+  const filtedMovies = movies?.filter(({ title }) => {
+    return title?.toLowerCase().includes(query?.toLowerCase());
+  });
+
+  useEffect(() => {
+    fetchMovies();
+  }, []);
+
+  function onSubmit(e) {
+    e.preventDefault();
+    const value = inputRef.current.value;
+    console.log(value);
     fetch("http://localhost:8080/movies", {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ title: movieToAdd.current.value }),
-    });
-  };
+      body: JSON.stringify({
+        title: value,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }),
+    }).then(() => fetchMovies());
+
+    inputRef.current.value = "";
+  }
 
   return (
-    <div className="m-2">
-      <Table
-        className="w-75 mt-2"
-        striped={true}
-        bordered={true}
-        hover={true}
-        size="sm"
-      >
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Movie Title</th>
-          </tr>
-        </thead>
-        <tbody>
-          {movies?.map(({ id: id, title: title }) => {
-            return (
-              <tr>
-                <td>{id}</td>
-                <td>{title}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </Table>
-      <div>
-        <Form onSubmit={handleSearch}>
-          <Form.Group className="mb-3 w-25">
-            <Form.Control
-              ref={searchTerm}
-              type="text"
-              placeholder="Search"
-            ></Form.Control>
-          </Form.Group>
-        </Form>
-        <Form onSubmit={addMovie}>
-          <Form.Group className="w-50">
-            <Form.Control
-              ref={movieToAdd}
-              type="text"
-              placeholder="Movie Name"
-            ></Form.Control>
-            <Button className="mt-2" type="submit">
-              Add
-            </Button>
-          </Form.Group>
-        </Form>
-      </div>
-    </div>
+    <>
+      Search:
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        type="search"
+      />
+      <br />
+      <br />
+      <form onSubmit={onSubmit}>
+        New Item: <input ref={inputRef} type="text" />
+        <button type="submit">Add</button>
+      </form>
+      <h3>Movies:</h3>
+      {filtedMovies?.map(({ title, id }) => (
+        <div key={id}>{title}</div>
+      ))}
+    </>
   );
 }
 
