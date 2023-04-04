@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 const db = require("../sequelize/models");
+const { Op } = require("sequelize");
 
 db.sequelize
   .authenticate()
@@ -26,6 +27,18 @@ router.post("/movies", function (req, res) {
     .then((movie) => {
       console.log(`${movie.title}'s auto-generated ID: ${movie.id}`);
       res.sendStatus(201);
+    });
+});
+router.delete("/movies/:id", function (req, res) {
+  db.movies
+    .destroy({
+      where: {
+        id: req.params.id,
+      },
+    })
+    .then(() => {
+      console.log("Movie was deleted");
+      res.sendStatus(204);
     });
 });
 
